@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CarRequest;
 use App\Models\Car;
 use App\Models\Passenger;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class CarController extends Controller
 {
@@ -14,10 +17,31 @@ class CarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $model = Car::paginate(10);
-        return view('admin.cars.index', compact('model'));
+        // $model = Car::paginate(10);
+        $pageSize = 10;
+        $min_travel_fee = Car::min('travel_fee');
+        $max_travel_fee = Car::max('travel_fee');
+        $keyword = $request->has('keyword') ? $request->keyword : "";
+        $plate_number = isset($request->plate_number) ? $request->plate_number : '';
+        $start_travel_fee = isset($request->start_travel_fee) ? $request->start_travel_fee : '';
+        $end_travel_fee = isset($request->end_travel_fee) ? $request->end_travel_fee : '';
+        $query = Car::where('owner','like',"%$keyword%");
+        if(!empty($plate_number)){
+            $query->where('plate_number','like',"%$plate_number%");
+        }
+        if(!empty($start_travel_fee) && $end_travel_fee){
+            $query->whereBetween('travel_fee', [$start_travel_fee, $end_travel_fee]);
+        }
+        $model = $query->paginate($pageSize);
+        if(session('success_message')){
+            Alert::success('Thành công !', session('success_message'));
+        }
+        $searchData = compact('keyword', 'plate_number');
+        $searchData['start_travel_fee'] = $start_travel_fee;
+        $searchData['end_travel_fee'] = $end_travel_fee;
+        return view('admin.cars.index', compact('model','min_travel_fee','max_travel_fee', 'searchData'));
     }
 
     /**
@@ -36,19 +60,19 @@ class CarController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CarRequest $request)
     {
         $model = new Car();
         $model->fill($request->all());
         if($request->hasFile('plate_image')){
-            $deleteImg = str_replace('public/', 'storage/', $model->plate_image);
-            Storage::delete($deleteImg);
-            $image = $request->file('plate_image')->store('public/cars');
-            $plate_image = str_replace('public/', 'storage/', $image);
-            $model->plate_image = $plate_image;
+            $file = $request->file('plate_image');
+            $name = $file->getClientOriginalName();
+            $filename = uniqid() . '-' . $name;
+            $file->move('uploads/cars', $filename);
+            $model->plate_image = 'uploads/cars/'.$filename;
         }
         $model->save();
-        return redirect(route('cars.index'));
+        return redirect(route('cars.index'))->withSuccessMessage('Thêm thành công');
     }
 
     /**
@@ -59,7 +83,9 @@ class CarController extends Controller
      */
     public function show($id)
     {
-        //
+        $model = Car::find($id);
+        $model->load('passengers');
+        return view('admin.cars.detail', compact('model'));
     }
 
     /**
@@ -81,20 +107,25 @@ class CarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CarRequest $request, $id)
     {
         $model = Car::find($id);
         $model->fill($request->all());
         
         if($request->hasFile('plate_image')){
-            $deleteImg = str_replace('public/', 'storage/', $model->plate_image);
-            Storage::delete($deleteImg);
-            $image = $request->file('plate_image')->store('public/cars');
-            $plate_image = str_replace('public/', 'storage/', $image);
-            $model->plate_image = $plate_image;
+            $unlink = $model->plate_image;
+            if(is_file($unlink)){
+                $link = str_replace('public/cars/','',$unlink);
+                unlink($link);
+            }
+            $file = $request->file('plate_image');
+            $name = $file->getClientOriginalName();
+            $filename = uniqid() . '-' . $name;
+            $file->move('uploads/cars', $filename);
+            $model->plate_image = 'uploads/cars/'.$filename;
         }
         $model->save();
-        return redirect(route('cars.index'));
+        return redirect(route('cars.index'))->withSuccessMessage('Sửa thành công');
     }
 
     /**
@@ -109,6 +140,6 @@ class CarController extends Controller
         $model = Car::find($id);
         Passenger::where('car_id', $model->id)->delete();
         $model->delete();
-        return redirect(route('cars.index'));
+        return redirect(route('cars.index'))->withSuccessMessage('Xóa xe thành công');
     }
 }

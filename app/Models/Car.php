@@ -14,7 +14,7 @@ class Car extends Model
         'owner',
         'travel_fee',
     ];
-    public function passenger(){
+    public function passengers(){
         return $this->hasMany(Passenger::class, 'car_id', 'id');
     }
 }

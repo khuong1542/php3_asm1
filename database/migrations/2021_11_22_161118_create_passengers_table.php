@@ -18,9 +18,7 @@ class CreatePassengersTable extends Migration
             $table->string('name');
             $table->integer('car_id');
             $table->dateTime('travel_time');
-            // $table->dateTime('start_time')->nullable();
-            // $table->dateTime('end_time')->nullable();
-            $table->string('avatar')->default('imaegs/default');
+            $table->string('avatar')->default('images/default');
             $table->timestamps();
         });
     }

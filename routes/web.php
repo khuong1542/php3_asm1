@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
+Route::get('403', function(){
+    return view('403');
+})->name('403');
+
+Route::get('login', [UserController::class, 'login'])->name('login');
+Route::post('login', [UserController::class, 'post_login'])->name('post_login');
+Route::post('logout', [UserController::class, 'logout'])->name('logout');
+Route::get('reset-password/{id}', [UserController::class, 'reset_password'])->name('reset-password');
+Route::post('reset-password/{id}', [UserController::class, 'updatepassword']);

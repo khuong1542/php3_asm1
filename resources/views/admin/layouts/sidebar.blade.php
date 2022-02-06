@@ -11,10 +11,10 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="admintheme/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                <img src="{{Auth::user()->avatar}}" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Alexander Pierce</a>
+                <a href="#" class="d-block">{{Auth::user()->name}}</a>
             </div>
         </div>
 
@@ -35,7 +35,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
 							 with font-awesome or any other icon font library -->
-                <li class="nav-item menu-open">
+                <li class="nav-item">
                     <a href="{{route('dashboard')}}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
@@ -43,51 +43,36 @@
                         </p>
                     </a>
                 </li>
+                @foreach($custom_sidebar as $item)
                 <li class="nav-item">
-                    <a href="{{route('cars.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-car"></i>
+                    <a href="{{$item['url']}}" class="nav-link">
+                        <i class="nav-icon {{$item['icon']}}"></i>
                         <p>
-                            Xe
+                            {{$item['name']}}
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @foreach($item['child'] as $child)
                         <li class="nav-item">
-                            <a href="{{route('cars.index')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Danh sách</p>
+                            <a href="{{$child['url']}}" class="nav-link">
+                                <i class="{{$child['icon']}} nav-icon"></i>
+                                <p>{{$child['name']}}</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{route('cars.create')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Thêm mới</p>
-                            </a>
-                        </li>
+                        @endforeach
                     </ul>
                 </li>
+                @endforeach
                 <li class="nav-item">
-                    <a href="{{route('passengers.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>
-                            Khách hàng
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                    <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                    document.getElementById('logout-form').submit();">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>{{ __('Đăng xuất') }}
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{route('passengers.index')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Danh sách</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{route('passengers.create')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Thêm mới</p>
-                            </a>
-                        </li>
-                    </ul>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
                 </li>
             </ul>
         </nav>

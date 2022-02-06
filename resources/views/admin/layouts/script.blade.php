@@ -26,13 +26,13 @@
     <script src="admintheme/plugins/summernote/summernote-bs4.min.js"></script>
     <!-- overlayScrollbars -->
     <script src="admintheme/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="admintheme/plugins/sweetalert2/sweetalert2.all.js"></script>
     <!-- AdminLTE App -->
     <script src="admintheme/dist/js/adminlte.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="admintheme/dist/js/demo.js"></script>
-    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="admintheme/dist/js/pages/dashboard.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+    <!-- <script src="https://unpkg.com/sweetalert2@7.18.0/dist/sweetalert2.all.js"></script> -->
+    
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
     <script>
         function Delete(){
             var conf = confirm('Chắc chắn xóa!');
