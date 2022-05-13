@@ -27,3 +27,7 @@ Route::post('login', [UserController::class, 'post_login'])->name('post_login');
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
 Route::get('reset-password/{id}', [UserController::class, 'reset_password'])->name('reset-password');
 Route::post('reset-password/{id}', [UserController::class, 'updatepassword']);
+
+Route::get('404',function(){
+    return view('error.404');
+});
